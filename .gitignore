@@ -1,4 +1,4 @@
-.bin
-.json
-.asc
+*.bin
+*.json
+*.asc
 .DS_Store
