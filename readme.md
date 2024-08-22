@@ -34,6 +34,27 @@ This repository contains a series of projects designed for the Icestick FPGA dev
 
 Each project is organized in its own directory with all the necessary Verilog/VHDL files, simulation files, and testbenches. Follow the instructions in each project's folder to build and run it on your Icestick development board.
 
+## Automating Project Setup with `create_project.py`
+
+To simplify the creation of new projects, use the `create_project.py` script. This script automates the setup of the project structure, generates necessary files (like VHDL, Verilog, and PCF files), and configures the Makefile according to your project name.
+
+### Usage
+
+1. Run the script:
+    ```bash
+    python create_project.py
+    ```
+
+2. When prompted, enter your desired project name. If the name contains a number followed by an underscore (e.g., `2_led_pattern`), the script will sanitize the internal names, removing the number and underscore.
+
+3. The script will generate:
+    - Project folder structure
+    - VHDL and Verilog files, including a PLL module
+    - A `Makefile` configured for your project
+    - A PCF file named `icestick.pcf` (specific to the Icestick development board)
+
+The generated project is ready to be built using the `make all` command.
+
 ## Docker Setup and Usage
 
 This project uses Docker containers to simplify the build process. The following Docker images are used:
