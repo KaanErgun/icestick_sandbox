@@ -34,6 +34,14 @@ This repository contains a series of projects designed for the Icestick FPGA dev
 
 Each project is organized in its own directory with all the necessary Verilog/VHDL files, simulation files, and testbenches. Follow the instructions in each project's folder to build and run it on your Icestick development board.
 
+## Icestick Pinout and Datasheet
+
+Here is the pinout diagram for the Icestick development board:
+
+![Icestick Pinout](icestick_pinout.png)
+
+For more detailed information, you can refer to the [Icestick Datasheet (PDF)](icestick.pdf).
+
 ## Automating Project Setup with `create_project.py`
 
 To simplify the creation of new projects, use the `create_project.py` script. This script automates the setup of the project structure, generates necessary files (like VHDL, Verilog, and PCF files), and configures the Makefile according to your project name.
@@ -59,9 +67,7 @@ The generated project is ready to be built using the `make all` command.
 
 This project uses Docker containers to simplify the build process. The following Docker images are used:
 
-- `ghdl/synth:icestorm`: For `icepack` commands.
-- `ghdl/synth:nextpnr`: For `nextpnr-ice40` commands.
-- `ghdl/synth:beta`: For `yosys` commands.
+- `alpha-nerds-icestick-env`: A custom Docker image that includes all necessary tools (Yosys, nextpnr, icestorm, and GHDL) for building Icestick projects.
 
 ### Docker Installation
 
@@ -74,7 +80,3 @@ To build the project, run:
 ```bash
 make all
 ```
-
-
-:heart: özge :heart:
-
