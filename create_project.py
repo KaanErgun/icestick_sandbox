@@ -144,10 +144,10 @@ TOP_LEVEL = $(PROJ)
 VHDL_FILES = $(shell find src/vhdl/ -name '*.vhdl')
 VERILOG_FILES = $(shell find src/verilog/ -name '*.v')
 
-DOCKER_CMD = docker run --rm -it -v /$(shell pwd):/wrk -w /wrk
-ICEPACK = $(DOCKER_CMD) ghdl/synth:icestorm icepack
-NEXTPNR = $(DOCKER_CMD) ghdl/synth:nextpnr nextpnr-ice40
-YOSYS = $(DOCKER_CMD) ghdl/synth:beta yosys
+DOCKER_CMD = docker run --rm -it -v $(shell pwd):/wrk -w /wrk alpha-nerds-icestick-env
+ICEPACK = $(DOCKER_CMD) icepack
+NEXTPNR = $(DOCKER_CMD) nextpnr-ice40
+YOSYS = $(DOCKER_CMD) yosys
 
 # Output directory
 OUTPUT_DIR = bin
@@ -155,7 +155,7 @@ OUTPUT_DIR = bin
 all: $(OUTPUT_DIR)/$(PROJ).bin
 
 $(OUTPUT_DIR)/%.json: $(VHDL_FILES) $(VERILOG_FILES) $(PIN_DEF)
-	$(YOSYS) -m ghdl -p \\
+	$(YOSYS) -m /ghdl-yosys-plugin/ghdl.so -p \\
 		"ghdl $(VHDL_FILES) -e $(TOP_LEVEL); \\
 		read_verilog $(VERILOG_FILES); \\
 		synth_ice40 -json $@"
@@ -180,6 +180,7 @@ clean:
     with open(file_path, "w") as file:
         file.write(makefile_content)
     print(f"Makefile created at: {file_path}")
+
 
 def main():
     project_name = input("Enter the project name: ")
