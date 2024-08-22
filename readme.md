@@ -73,6 +73,7 @@ To build the project, run:
 
 ```bash
 make all
+```
 
 
 :heart: özge :heart:
