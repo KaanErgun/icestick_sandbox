@@ -5,6 +5,7 @@ This repository contains a series of projects designed for the Icestick FPGA dev
 ## Project Structure
 
 ### Beginner Level Projects
+
 1. **LED Blink**: A simple LED blinking project.
 2. **LED Pattern (AND Gate)**: Controlling an LED using two buttons with an AND gate.
 3. **LED Pattern (OR Gate)**: Controlling an LED using an OR gate.
@@ -17,6 +18,7 @@ This repository contains a series of projects designed for the Icestick FPGA dev
 10. **Binary to 7-Segment Display Decoder**: Displaying a 4-bit binary number on a 7-segment display.
 
 ### Intermediate Level Projects
+
 1. **UART Communication**: Sending and receiving data between the FPGA and a PC via UART.
 2. **I2C Sensor Reading**: Reading data from a sensor using the I2C protocol.
 3. **SPI EEPROM Read/Write**: Communicating with an EEPROM via SPI.
@@ -30,12 +32,23 @@ This repository contains a series of projects designed for the Icestick FPGA dev
 
 ## Getting Started
 
-Each project is organized in its own directory with all the necessary Verilog files, simulation files, and testbenches. Follow the instructions in each project's folder to build and run it on your Icestick development board.
+Each project is organized in its own directory with all the necessary Verilog/VHDL files, simulation files, and testbenches. Follow the instructions in each project's folder to build and run it on your Icestick development board.
 
-## Contributing
+## Docker Setup and Usage
 
-Feel free to fork this repository and contribute your own projects or improvements.
+This project uses Docker containers to simplify the build process. The following Docker images are used:
 
-## License
+- `ghdl/synth:icestorm`: For `icepack` commands.
+- `ghdl/synth:nextpnr`: For `nextpnr-ice40` commands.
+- `ghdl/synth:beta`: For `yosys` commands.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Docker Installation
+
+If you don't have Docker installed, you can install it by following the instructions [here](https://docs.docker.com/get-docker/).
+
+### Building the Project
+
+To build the project, run:
+
+```bash
+make all
