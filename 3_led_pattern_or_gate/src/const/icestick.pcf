@@ -3,3 +3,7 @@
 
 # Example:
 # set_io led A2
+set_io led 99
+set_io -pullup yes button1 78
+set_io -pullup yes button2 87
+
