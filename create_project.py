@@ -2,7 +2,7 @@ import os
 import re
 
 def sanitize_project_name(project_name):
-    # Proje ismindeki sayı ve ilk alt çizgiye kadar olan kısmı kaldırıyoruz.
+    # Remove any leading numbers and the first underscore from the project name.
     sanitized_name = re.sub(r'^\d+_', '', project_name)
     return sanitized_name
 
@@ -18,7 +18,7 @@ def create_directory_structure(project_name):
         f"{base_dir}/src/vhdl",
     ]
 
-    # Create folders
+    # Create the necessary folder structure
     for folder in folders:
         os.makedirs(folder, exist_ok=True)
     
@@ -31,7 +31,7 @@ def create_pcf_file(project_name):
 # Example:
 # set_io led A2
 """
-    file_path = f"./{project_name}/src/const/icestick.pcf"  # PCF dosyası adı sabit kaldı
+    file_path = f"./{project_name}/src/const/icestick.pcf"  # Fixed PCF file name
     with open(file_path, "w") as file:
         file.write(pcf_content)
     print(f"PCF file created at: {file_path}")
@@ -137,30 +137,31 @@ endmodule
 def create_makefile(project_name, sanitized_name):
     makefile_content = f"""PROJ = {sanitized_name}
 
-PIN_DEF = src/const/icestick.pcf  # Sabit PCF dosyası adı
+PIN_DEF = src/const/icestick.pcf  # Fixed PCF file name
 DEVICE = hx1k
 
 TOP_LEVEL = $(PROJ)
 VHDL_FILES = $(shell find src/vhdl/ -name '*.vhdl')
 VERILOG_FILES = $(shell find src/verilog/ -name '*.v')
+PCF_FILES = $(PIN_DEF)
 
 DOCKER_CMD = docker run --rm -it -v $(shell pwd):/wrk -w /wrk alpha-nerds-icestick-env
 ICEPACK = $(DOCKER_CMD) icepack
 NEXTPNR = $(DOCKER_CMD) nextpnr-ice40
-YOSYS = $(DOCKER_CMD) yosys
+YOSYS = $(DOCKER_CMD) yosys -m /ghdl-yosys-plugin/ghdl.so
 
 # Output directory
 OUTPUT_DIR = bin
 
 all: $(OUTPUT_DIR)/$(PROJ).bin
 
-$(OUTPUT_DIR)/%.json: $(VHDL_FILES) $(VERILOG_FILES) $(PIN_DEF)
-	$(YOSYS) -m /ghdl-yosys-plugin/ghdl.so -p \\
+$(OUTPUT_DIR)/%.json: $(VHDL_FILES) $(VERILOG_FILES) $(PCF_FILES)
+	$(YOSYS) -p \\
 		"ghdl $(VHDL_FILES) -e $(TOP_LEVEL); \\
 		read_verilog $(VERILOG_FILES); \\
 		synth_ice40 -json $@"
 
-$(OUTPUT_DIR)/%.asc: $(OUTPUT_DIR)/%.json $(PIN_DEF)
+$(OUTPUT_DIR)/%.asc: $(OUTPUT_DIR)/%.json $(PCF_FILES)
 	$(NEXTPNR) --package $(DEVICE) --pcf $(PIN_DEF) --pcf-allow-unconstrained --json $< --asc $@
 
 $(OUTPUT_DIR)/%.bin: $(OUTPUT_DIR)/%.asc
@@ -180,7 +181,6 @@ clean:
     with open(file_path, "w") as file:
         file.write(makefile_content)
     print(f"Makefile created at: {file_path}")
-
 
 def main():
     project_name = input("Enter the project name: ")
