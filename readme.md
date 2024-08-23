@@ -49,6 +49,7 @@ To simplify the creation of new projects, use the `create_project.py` script. Th
 ### Usage
 
 1. Run the script:
+
     ```bash
     python create_project.py
     ```
