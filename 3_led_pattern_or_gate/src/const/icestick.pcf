@@ -1,0 +1,5 @@
+# Pin configuration for IceStick
+# This file defines the pin mappings for the FPGA
+
+# Example:
+# set_io led A2
