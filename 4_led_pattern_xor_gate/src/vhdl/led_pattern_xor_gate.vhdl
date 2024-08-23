@@ -1,6 +1,6 @@
 -- led_pattern_xor_gate.vhdl
 -- This is the top-level VHDL file for the led_pattern_xor_gate project.
--- All LEDs are initialized to HIGH, with a PLL for clock stabilization.
+-- The LED is controlled using an XOR gate with two input buttons.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -9,13 +9,15 @@ entity led_pattern_xor_gate is
     port (
         clk_raw : in std_logic;
         rst : in std_logic;
+        button1 : in std_logic;
+        button2 : in std_logic;
         led : out std_logic
     );
 end entity led_pattern_xor_gate;
 
 architecture Behavioral of led_pattern_xor_gate is
     signal clk : std_logic;
-    signal led_signal : std_logic := '1'; -- Initialize the LED signal to HIGH
+    signal xor_output : std_logic;
 
     -- PLL component declaration
     component pll is
@@ -25,6 +27,15 @@ architecture Behavioral of led_pattern_xor_gate is
             locked  : out std_logic
         );
     end component pll;
+
+    -- XOR gate component declaration
+    component xor_gate is
+        port (
+            button1 : in std_logic;
+            button2 : in std_logic;
+            xor_output : out std_logic
+        );
+    end component xor_gate;
 
 begin
 
@@ -36,16 +47,15 @@ begin
             locked  => open
         );
 
-    -- Assign the signal to the output port
-    led <= led_signal;
+    -- XOR gate instantiation
+    xor_gate_inst : xor_gate
+        port map(
+            button1 => button1,
+            button2 => button2,
+            xor_output => xor_output
+        );
 
-    led_process: process(clk, rst)
-    begin
-        if rst = '1' then
-            led_signal <= '1'; -- Set LED to HIGH on reset
-        elsif rising_edge(clk) then
-            -- Logic for LED control (can be customized here)
-            led_signal <= not led_signal;
-        end if;
-    end process;
+    -- Assign the XOR gate output to the LED
+    led <= xor_output;
+
 end architecture Behavioral;
