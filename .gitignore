@@ -2,3 +2,5 @@
 *.json
 *.asc
 .DS_Store
+vunit_env/
+vunit_out/
