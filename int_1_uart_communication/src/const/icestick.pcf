@@ -1,0 +1,18 @@
+# Pin configuration for IceStick - UART Communication Project
+# This file defines the pin mappings for the FPGA
+
+# Clock input (12 MHz oscillator)
+set_io clk_raw 21
+
+# Reset button (active high)
+set_io rst 64
+
+# UART pins
+set_io uart_rx 9   # UART RX pin
+set_io uart_tx 8   # UART TX pin
+
+# LED outputs (IceStick has 5 LEDs)
+set_io led1 99     # LED1 - RX activity indicator
+set_io led2 98     # LED2 - TX activity indicator
+set_io led3 97     # LED3 - Error indicator
+set_io led4 96     # LED4 - Heartbeat/alive indicator
