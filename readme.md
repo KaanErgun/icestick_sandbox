@@ -74,6 +74,39 @@ This project uses Docker containers to simplify the build process. The following
 
 If you don't have Docker installed, you can install it by following the instructions [here](https://docs.docker.com/get-docker/).
 
+## Hardware Programming Setup
+
+For programming the FPGA hardware, you have two options:
+
+### Option 1: Host iceprog Installation (Recommended)
+
+For reliable hardware programming, install `iceprog` on your host system using the provided installation script:
+
+```bash
+./install_iceprog.sh
+```
+
+This script will:
+- Detect your operating system (macOS/Linux)
+- Install required dependencies
+- Build and install the IceStorm toolchain
+- Verify the installation
+
+**Supported Systems:**
+- macOS (with Homebrew)
+- Ubuntu/Debian
+- Fedora/CentOS/RHEL
+- Arch Linux
+
+### Option 2: Docker USB Passthrough
+
+Alternatively, you can use Docker with USB passthrough (experimental on macOS):
+
+1. Enable USB passthrough in Docker Desktop (if available)
+2. Use the Docker-based `make burn` command
+
+**Note:** Docker USB passthrough can be unreliable on macOS due to virtualization limitations.
+
 ### Building the Project
 
 To build the project, run:
@@ -81,3 +114,16 @@ To build the project, run:
 ```bash
 make all
 ```
+
+### Programming the FPGA
+
+After building, program your FPGA board:
+
+```bash
+make burn
+```
+
+**Troubleshooting:**
+- Ensure your FPGA board is connected via USB
+- On Linux, add your user to the `dialout` group: `sudo usermod -a -G dialout $USER`
+- Restart your terminal session after group changes
