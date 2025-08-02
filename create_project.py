@@ -1,10 +1,53 @@
 import os
 import re
+import subprocess
+import sys
 
 def sanitize_project_name(project_name):
     # Remove any leading numbers and the first underscore from the project name.
     sanitized_name = re.sub(r'^\d+_', '', project_name)
     return sanitized_name
+
+def check_and_setup_docker_image():
+    """Check if Docker image exists, if not try to pull it from Docker Hub"""
+    docker_image = "alpha-nerds-icestick-env"
+    docker_hub_image = "kaanergun/alpha-nerds-icestick-env"
+    
+    try:
+        # Check if Docker is installed
+        subprocess.run(["docker", "--version"], check=True, capture_output=True)
+        print("Docker is installed.")
+        
+        # Check if the image exists locally
+        result = subprocess.run(["docker", "images", "-q", docker_image], 
+                              capture_output=True, text=True)
+        
+        if result.stdout.strip():
+            print(f"Docker image '{docker_image}' found locally.")
+            return True
+        else:
+            print(f"Docker image '{docker_image}' not found locally.")
+            print(f"Attempting to pull from Docker Hub: {docker_hub_image}")
+            
+            # Try to pull from Docker Hub
+            try:
+                subprocess.run(["docker", "pull", docker_hub_image], check=True)
+                # Tag the pulled image with the expected name
+                subprocess.run(["docker", "tag", docker_hub_image, docker_image], check=True)
+                print(f"Successfully pulled and tagged Docker image.")
+                return True
+            except subprocess.CalledProcessError:
+                print(f"Failed to pull Docker image from Docker Hub.")
+                print(f"You may need to build the image locally using the Dockerfile.")
+                return False
+                
+    except subprocess.CalledProcessError:
+        print("Docker is not installed or not accessible.")
+        print("Please install Docker to use the build system.")
+        return False
+    except FileNotFoundError:
+        print("Docker command not found. Please install Docker.")
+        return False
 
 def create_directory_structure(project_name):
     base_dir = f"./{project_name}"
@@ -146,6 +189,7 @@ VERILOG_FILES = $(shell find src/verilog/ -name '*.v')
 PCF_FILES = $(PIN_DEF)
 
 DOCKER_CMD = docker run --rm -it -v $(shell pwd):/wrk -w /wrk alpha-nerds-icestick-env
+DOCKER_USB_CMD = docker run --rm -it --privileged -v /dev:/dev -v $(shell pwd):/wrk -w /wrk alpha-nerds-icestick-env
 ICEPACK = $(DOCKER_CMD) icepack
 NEXTPNR = $(DOCKER_CMD) nextpnr-ice40
 YOSYS = $(DOCKER_CMD) yosys -m /ghdl-yosys-plugin/ghdl.so
@@ -168,7 +212,14 @@ $(OUTPUT_DIR)/%.bin: $(OUTPUT_DIR)/%.asc
 	$(ICEPACK) $< $@
 
 burn: $(OUTPUT_DIR)/$(PROJ).bin
-	iceprog $<
+	@echo "Programming FPGA with iceprog..."
+	@if command -v iceprog >/dev/null 2>&1; then \\
+		echo "Using host iceprog..."; \\
+		iceprog $<; \\
+	else \\
+		echo "Host iceprog not found. Using Docker (requires USB passthrough)..."; \\
+		$(DOCKER_USB_CMD) iceprog $<; \\
+	fi
 
 clean:
 	rm -f $(OUTPUT_DIR)/$(PROJ).json $(OUTPUT_DIR)/$(PROJ).asc $(OUTPUT_DIR)/$(PROJ).bin
@@ -183,6 +234,21 @@ clean:
     print(f"Makefile created at: {file_path}")
 
 def main():
+    print("=== IceStick Project Setup ===")
+    
+    # Check Docker setup first
+    print("\nChecking Docker environment...")
+    docker_ready = check_and_setup_docker_image()
+    
+    if not docker_ready:
+        print("\nWarning: Docker environment is not ready.")
+        print("You can still create the project, but you may need to set up Docker manually for building.")
+        response = input("Continue anyway? (y/n): ")
+        if response.lower() != 'y':
+            print("Project setup cancelled.")
+            sys.exit(1)
+    
+    print("\nCreating project...")
     project_name = input("Enter the project name: ")
     sanitized_name = sanitize_project_name(project_name)
     
@@ -192,7 +258,15 @@ def main():
     create_verilog_pll_file(project_name, sanitized_name)
     create_makefile(project_name, sanitized_name)
     
-    print(f"Project '{project_name}' setup completed. Internal names sanitized to '{sanitized_name}'.")
+    print(f"\nProject '{project_name}' setup completed. Internal names sanitized to '{sanitized_name}'.")
+    
+    if docker_ready:
+        print("\nDocker environment is ready. You can now build the project with:")
+        print(f"  cd {project_name}")
+        print("  make all")
+        print("  make burn  # To program the FPGA")
+    else:
+        print("\nNote: Set up Docker environment before building the project.")
 
 if __name__ == "__main__":
     main()
