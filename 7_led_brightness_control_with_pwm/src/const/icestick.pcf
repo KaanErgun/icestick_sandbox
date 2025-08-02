@@ -1,0 +1,18 @@
+# Pin configuration for IceStick
+# This file defines the pin mappings for the FPGA
+
+# Example:
+# set_io led A2
+
+# iCEstick Pin Constraints for LED Brightness Control with PWM
+# Based on iCEstick pinout
+
+# Clock input - 12MHz oscillator
+set_io clk_12mhz 21
+
+# LED outputs - Using the 5 LEDs on iCEstick
+set_io leds[0] 99   # LED D1
+set_io leds[1] 98   # LED D2  
+set_io leds[2] 97   # LED D3
+set_io leds[3] 96   # LED D4
+set_io leds[4] 95   # LED D5
