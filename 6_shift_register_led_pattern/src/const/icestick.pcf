@@ -1,0 +1,15 @@
+# Pin configuration for IceStick
+# This file defines the pin mappings for the FPGA
+
+# LED outputs for shift register pattern
+set_io led1 99
+set_io led2 98
+set_io led3 97
+set_io led4 96
+set_io led5 95
+
+# Clock input
+set_io clk_raw 21
+
+# Reset input (optional - can be connected to a button)
+# set_io rst XX
