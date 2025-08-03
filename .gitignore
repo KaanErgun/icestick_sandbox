@@ -1,6 +1,12 @@
+# FPGA build artifacts
 *.bin
-*.json
 *.asc
 .DS_Store
 vunit_env/
 vunit_out/
+
+# FPGA synthesis files
+*.json
+
+# Extension directory - not tracked in git
+extension/
